@@ -1,0 +1,19 @@
+{
+  "java.configuration.updateBuildConfiguration": "automatic",
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "bin/": true,
+    ".classpath": true,
+    ".project": true
+  },
+  "wpilib.online": true,
+  "workbench.colorCustomizations": {
+    "activityBar.background": "#283107",
+    "titleBar.activeBackground": "#38450A",
+    "titleBar.activeForeground": "#F8FCE9"
+  }
+}
