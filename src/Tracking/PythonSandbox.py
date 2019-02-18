@@ -348,7 +348,7 @@ class PythonSandbox:
 
         json_pixels = json.dumps(pixels)
 
-        jevois.sendSerial('test text')
+        jevois.sendSerial(json_pixels)
 
 
 
