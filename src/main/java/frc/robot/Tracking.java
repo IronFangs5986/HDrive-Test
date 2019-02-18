@@ -72,7 +72,7 @@ public class Tracking {
 
 	static final int MAPPING_HEIGHT_PXL_2 = 240;
 
-	static final int MAPPING_FRMRT_FPS_2 = 30;
+	static final int MAPPING_FRMRT_FPS_2 = 15;
 
 	// Packet format constants
 
@@ -144,77 +144,40 @@ public class Tracking {
 		// Retry strategy to get this serial port open or switch to the other usb ports
 
 		while (visionPort == null && retry_counter++ < 10) {
-
 			try {
-
 				System.out.print("Creating JeVois SerialPort...");
-
 				visionPort = new SerialPort(BAUD_RATE, SerialPort.Port.kUSB);
-
-				System.out.println("SUCCESS!!");
-
+				System.out.println("SUCCESS USB");
 			} catch (Exception e) {
-
 				try {
-
 					System.out.print("Creating JeVois SerialPort...");
-
 					visionPort = new SerialPort(BAUD_RATE, SerialPort.Port.kUSB1);
-
-					System.out.println("SUCCESS!!");
-
+					System.out.println("SUCCESS UDB1");
 				} catch (Exception f) {
-
 					try {
-
 						System.out.print("Creating JeVois SerialPort...");
-
 						visionPort = new SerialPort(BAUD_RATE, SerialPort.Port.kUSB2);
-
-						System.out.println("SUCCESS!!");
-
+						System.out.println("SUCCESS USB2");
 					} catch (Exception g) {
-
 						System.out.println("FAILED!!");
-
 						System.out.println("Failed to connect to JeVois on any port!");
-
 						sleep(500);
-
 						System.out.println("Retry " + Integer.toString(retry_counter));
-
 					}
-
 				}
-
 			}
-
 		}
-
 	}
 
-	/*
-	 * 
-	 * Check if we are able to communicate with the JeVois Camera
-	 * 
-	 */
-
+	/* Check if we are able to communicate with the JeVois Camera	 */
 	public boolean checkJeVoisConnection() {
-
 		// Test to make sure we are actually talking to the JeVois
-
 		if (sendPing() != 0) {
-
 			DriverStation.reportError("JeVois ping test failed. Not starting vision system.", false);
-
 			return false;
-
 		}
-
 		System.out.println("JeVois Connection Good!");
-
 		return true;
-
 	}
 
 	/**
@@ -237,7 +200,8 @@ public class Tracking {
 			camStreamRunning = true;
 			trackingEnable = true;
 			System.out.println("Vision Cam Stream 1 Opened!!");
-
+			//sendCmd("setpar serout Hard");
+			//sendCmd("setpar serlog None");
 		} catch (Exception e) {
 			DriverStation.reportError("Cannot start camera stream 1 from JeVois", false);
 			e.printStackTrace();
@@ -299,6 +263,7 @@ public class Tracking {
 			blockAndPrintAllSerial();
 		} else {
 			// Real code - Grab packets and parse them.
+			//System.out.println("Attempting to get packet");
 			String packet = blockAndGetPacket(10);
 			// Check if we are interested in tracking data and parse it if we are.
 			if (trackingEnable) {
@@ -324,17 +289,10 @@ public class Tracking {
 	 */
 
 	public int sendPing() {
-
-		int retval = -1;
-
 		if (visionPort != null) {
-
-			retval = sendCmdAndCheck("ping");
-
+	 		return sendCmdAndCheck("ping");
 		}
-
-		return retval;
-
+		return -1;
 	}
 
 	/**
@@ -363,11 +321,8 @@ public class Tracking {
 	 */
 
 	public void setCamHumanDriverMode() {
-
 		if (visionPort != null) {
-
 			sendCmdAndCheck("setcam autoexp 0"); // Enable AutoExposure
-
 		}
 
 	}
@@ -383,13 +338,8 @@ public class Tracking {
 	 */
 
 	private int sendCmd(String cmd) {
-
-		int bytes;
-
-		bytes = visionPort.writeString(cmd + "\n");
-
+		int bytes = visionPort.writeString(cmd + "\n");
 		System.out.println("wrote " + bytes + "/" + (cmd.length() + 1) + " bytes, cmd: " + cmd);
-
 		return bytes;
 
 	};
@@ -409,25 +359,15 @@ public class Tracking {
 	 */
 
 	public int sendCmdAndCheck(String cmd) {
-
 		int retval = 0;
-
 		sendCmd(cmd);
-
 		retval = blockAndCheckForOK(1.0);
-
 		if (retval == -1) {
-
 			System.out.println(cmd + " Produced an error");
-
 		} else if (retval == -2) {
-
 			System.out.println(cmd + " timed out");
-
 		}
-
 		return retval;
-
 	};
 
 	// Persistent but "local" variables for getBytesPeriodic()
@@ -502,47 +442,26 @@ public class Tracking {
 	 */
 
 	public int blockAndCheckForOK(double timeout_s) {
-
 		int retval = -2;
-
 		double startTime = Timer.getFPGATimestamp();
-
 		String testStr = "";
-
 		if (visionPort != null) {
-
 			while (Timer.getFPGATimestamp() - startTime < timeout_s) {
-
 				if (visionPort.getBytesReceived() > 0) {
-
 					testStr += visionPort.readString();
-
 					if (testStr.contains("OK")) {
-
 						retval = 0;
-
 						break;
-
 					} else if (testStr.contains("ERR")) {
-
 						retval = -1;
-
 						break;
-
 					}
-
 				} else {
-
 					sleep(10);
-
 				}
-
 			}
-
 		}
-
 		return retval;
-
 	}
 
 	// buffer to contain data from the port while we gather full packets
@@ -552,26 +471,21 @@ public class Tracking {
 	/**
 	 * 
 	 * Blocks thread execution till we get a valid packet from the serial line
-	 * 
 	 * or timeout.
 	 * 
 	 * Return values:
-	 * 
 	 * String = the packet
-	 * 
 	 * null = No full packet found before timeout_s
-	 * 
 	 */
-
 	public String blockAndGetPacket(double timeout_s) {
 		double startTime = Timer.getFPGATimestamp();
-
 		if (visionPort != null) {
 			System.out.println("Has a port");
+			int attempt = 0;
+			//sendCmd("setpar serout Hard");
 			while (Timer.getFPGATimestamp() - startTime < timeout_s) {
-
+				attempt++;
 				// Keep trying to get bytes from the serial port until the timeout expires.
-
 				if (visionPort.getBytesReceived() > 0) {
 					// If there are any bytes available, read them in and
 					// append them to the buffer.
@@ -626,6 +540,7 @@ public class Tracking {
 					sleep(10);
 				}
 			}
+			System.out.println("Made " + attempt + " attempts to retrieve packet");
 
 		} else {
 			System.err.print("No port for reading packet\n");

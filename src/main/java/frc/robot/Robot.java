@@ -137,7 +137,6 @@ public class Robot extends TimedRobot {
 	@Override
 	public void teleopPeriodic() {
 		Scheduler.getInstance().run();
-
 		
 		//System.out.println(trackingCam.getCamMode()+" "+trackingCam.isVisionOnline()+" "+trackingCam.getTx()+" "+trackingCam.getTy()+" "+trackingCam.getTa()+" "+trackingCam.getTv());
 	}

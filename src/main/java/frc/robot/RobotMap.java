@@ -15,6 +15,7 @@ import edu.wpi.cscore.UsbCamera;
 import edu.wpi.cscore.VideoMode.PixelFormat;
 import edu.wpi.first.wpilibj.CameraServer;
 import edu.wpi.first.wpilibj.RobotDrive;
+import edu.wpi.first.wpilibj.Servo;
 import edu.wpi.first.wpilibj.Victor;
 
 /**
@@ -61,9 +62,8 @@ public class RobotMap {
 		// RobotDrive
 
 		StrafeyBoys = new Victor(1); // Define the strafey boys
-
-		//UsbCamera server = CameraServer.getInstance().startAutomaticCapture();
-		//server.setVideoMode(PixelFormat.kYUYV, 320, 240, 60);
+		UsbCamera server = CameraServer.getInstance().startAutomaticCapture();
+		server.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);
 		
 		//server.setResolution(320, 240);
 		//server.setFPS(25);

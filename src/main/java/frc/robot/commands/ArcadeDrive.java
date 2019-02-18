@@ -24,7 +24,7 @@ public class ArcadeDrive extends Command {
 		} else {
 			turnSpeed = rawTurn;
 		}
-		Robot.driveTrain.arcadeDrive(Robot.oi.joystick3.getRawAxis(1), turnSpeed);
+		//Robot.driveTrain.arcadeDrive(Robot.oi.joystick3.getRawAxis(1), turnSpeed);
 	}
 
 	@Override
