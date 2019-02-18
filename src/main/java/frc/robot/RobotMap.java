@@ -62,8 +62,8 @@ public class RobotMap {
 		// RobotDrive
 
 		StrafeyBoys = new Victor(1); // Define the strafey boys
-		UsbCamera server = CameraServer.getInstance().startAutomaticCapture();
-		server.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);
+		//UsbCamera server = CameraServer.getInstance().startAutomaticCapture();
+		//server.setVideoMode(PixelFormat.kYUYV, 320, 240, 15);
 		
 		//server.setResolution(320, 240);
 		//server.setFPS(25);
